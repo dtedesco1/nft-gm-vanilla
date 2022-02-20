@@ -46,7 +46,7 @@
 				</div>
 				
 				<!-- // Display of user's NFTs. -->
-				<div id="nfts" class="grid grid-cols-5 items-center justify-center pt-10 gap-7 flex flex-wrap"></div>
+				<div id="nfts" class="grid items-center justify-center pt-10 gap-7 flex flex-wrap"></div>
 				
 				<!-- // Feed of NFTs speaking. -->
 				<div id="feed" class="grid grid-cols-1 gap-4 my-6 px-2 md:px-4 lg:px-6"></div>
@@ -55,10 +55,10 @@
 
 		<!-- // Template for generation of user NFT display -->
 		<template id="nft_template">
-			<section class="grid place-items-center bg-white p-4">
+			<section onclick="speakUp(this)" class="grid place-items-center opacity-25 hover:opacity-100 hover:bg-indigo-250 bg-indigo-200 p-4 shadow-md rounded-lg">
 				<div class="w-full"><h1 class="font-bold text-center rounded-t-md"></h1></div>
-				<img onclick="speakUp(this)" class="opacity-25 hover:opacity-100 place-items-center bg-white w-40 h-40" src="" alt="">
-				<p class="text-xs break-all bg-white"></p>
+				<img class="place-items-center bg-white w-40 h-40" src="" alt="">
+				<p class="text-xs break-all"></p>
 			</section>
 		</template>
 
@@ -88,7 +88,6 @@
 					$("#btn-login").hide();
 					$("#btns-logout").show();
 				}
-				console.log("ran btnMngmt")
 			}
 
 			let user = Moralis.User.current();
@@ -96,37 +95,51 @@
 
 			function parseNfts () {
 				document.getElementById("nfts").innerHTML = ""
-				user = "0xd859d7d8603D2dAb768D679eEEC25930C8FC59C1" // Call metadata for will's address
+				address = user.get('ethAddress')
+				// address = "0xd859d7d8603D2dAb768D679eEEC25930C8FC59C1" // Call metadata for will's address
 				const settings = {
 					"async": true,
 					"crossDomain": true,
-					"url": `https://api.nftport.xyz/v0/accounts/${user}?chain=ethereum&page_size=5&continuation=None&include=metadata`, 
+					"url": `https://api.nftport.xyz/v0/accounts/${address}?chain=ethereum&page_size=5&continuation=None&include=metadata`, 
 					"method": "GET",
 					"headers": {
 						"Content-Type": "application/json",
-						"Authorization": process.env.NFTPORT_AUTHORIZATION
+						"Authorization": "cda7271d-f064-4b47-ac28-9481da8ea285"
 					}
 				};
+				console.log()
 				$.ajax(settings).done(function (nfts) {
-					console.log(nfts)
-					for(let i = 0; i <= 4; i++) {// Twenty is a weird limit. Remove the limit or add a notificatgion to the user
+
+					if (nfts.total == 0) {
+						console.log("No NFTs found for this user.")
 						const nftElement = document.getElementById("nft_template").content.cloneNode(true)
-						if (nfts.nfts[i].file_url != null) {
-							console.log(i, nfts.nfts[i].name, nfts.nfts[i].file_url)
-							const src = nfts.nfts[i].file_url
-							const name = nfts.nfts[i].name
-							nftElement.querySelector("h1").innerText = name
-							// nftElement.querySelector("a").href = src
-							nftElement.querySelector("img").src = src
-							nftElement.querySelector("img").alt = name
-						} else {
-							console.log("missing metadata", i, nfts.nfts[i])
-							nftElement.querySelector("img").src = "https://upload.wikimedia.org/wikipedia/commons/f/f3/Male-question.svg"
-							nftElement.querySelector("h1").innerText = "This NFT is missing metadata."
-							nftElement.querySelector("p").innerText = `Check the URI:  ${nfts.nfts[i].metadata_url}`
-							nftElement.querySelector("img").alt = "Unknown"
-						}
+						nftElement.querySelector("h1").innerText = "This is not an NFT."
+						nftElement.querySelector("img").src = "https://upload.wikimedia.org/wikipedia/commons/1/13/Magritte1-1-2008.jpg"
+						nftElement.querySelector("img").alt = "Non-NFT"
+						nftElement.querySelector("p").innerText = "You don't seem to have any NFTs, but you can still play along."
 						document.getElementById("nfts").append(nftElement)
+					}
+					else {
+						for(let i = 0; i <= 4; i++) { // five is a weird limit. Remove the limit or add a notificatgion to the user
+							const nftElement = document.getElementById("nft_template").content.cloneNode(true)
+
+							if (nfts.nfts[i].file_url != null) {
+								console.log(i, nfts.nfts[i].name, nfts.nfts[i].file_url)
+								const src = nfts.nfts[i].file_url
+								const name = nfts.nfts[i].name
+								nftElement.querySelector("h1").innerText = name
+								nftElement.querySelector("img").src = src
+								nftElement.querySelector("img").alt = name
+							} else {
+								console.log("missing metadata", i, nfts.nfts[i])
+								nftElement.querySelector("img").src = "https://upload.wikimedia.org/wikipedia/commons/f/f3/Male-question.svg"
+								nftElement.querySelector("h1").innerText = "This NFT is missing metadata."
+								nftElement.querySelector("p").innerText = `Check the URI:  ${nfts.nfts[i].metadata_url}`
+								nftElement.querySelector("img").alt = "Unknown"
+							}
+						document.getElementById("nfts").append(nftElement)
+						}
+
 					}
 				});
 			}
@@ -134,16 +147,14 @@
 			async function login() {
 				if (!user) {
 					 try {
-						 	user = "0xd859d7d8603D2dAb768D679eEEC25930C8FC59C1" // Call metadata for will's address
-							// user = await Moralis.authenticate({ signingMessage: "Load your NFTs into NFT gm." })
-							// console.log(user.get('ethAddress'))
-							console.log(user)
+							user = await Moralis.authenticate({ signingMessage: "Load your NFTs into NFT gm." })
 							parseNfts();
 							btnMngmt();
 					} catch(error) {
 						 console.log(error)
 					}
 				}
+				console.log("logged in")
 			}
 
 			async function logOut() {
@@ -156,10 +167,9 @@
 
 
 			async function speakUp(element) {
-				console.log(element)
 				const postEntry = document.getElementById("post_template").content.cloneNode(true)
-				postEntry.getElementById("img").src = element.src
-				postEntry.getElementById("name").innerText = element.alt
+				postEntry.getElementById("img").src = element.querySelector("img").src
+				postEntry.getElementById("name").innerText = element.querySelector("img").alt
 				document.getElementById("feed").prepend(postEntry)
 			}
 
