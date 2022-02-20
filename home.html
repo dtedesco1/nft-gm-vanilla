@@ -9,7 +9,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<title>NFT gm</title>
 
-		<!-- 		// Import Moralis -->
+		<!-- // Import Moralis -->
 		<script src="https://unpkg.com/moralis/dist/moralis.js"></script>
 
 		<!-- // Import Tailwind -->
@@ -104,7 +104,7 @@
 					"method": "GET",
 					"headers": {
 						"Content-Type": "application/json",
-						"Authorization": NFTPORT_AUTHORIZATION
+						"Authorization": process.env.NFTPORT_AUTHORIZATION
 					}
 				};
 				$.ajax(settings).done(function (nfts) {
