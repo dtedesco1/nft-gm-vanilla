@@ -73,13 +73,20 @@
 			</section>
 		</template>
 
+
+
 		<script>
 
+			// Moralis Setup
 			const serverUrl = "https://dhr2dvcmfyso.usemoralis.com:2053/server";
 			const appId = "viyjKmaI29omptWLUOwbL5dtVxSz0x9Wb7rp8TG4";
 			Moralis.start({ serverUrl, appId });
+			let user = Moralis.User.current();
+			btnMngmt();
+
 
 			function btnMngmt () {
+				// Show and hide buttons based on login
 				if (!user) {
 					$("#btn-login").show();
 					$("#btns-logout").hide();
@@ -90,13 +97,10 @@
 				}
 			}
 
-			let user = Moralis.User.current();
-			btnMngmt();
-
 			function parseNfts () {
+				// Collect NFTs from Moralis and inject them into the page
 				document.getElementById("nfts").innerHTML = ""
 				address = user.get('ethAddress')
-				// address = "0xd859d7d8603D2dAb768D679eEEC25930C8FC59C1" // Call metadata for will's address
 				const settings = {
 					"async": true,
 					"crossDomain": true,
@@ -145,6 +149,7 @@
 			}
 
 			async function login() {
+				// Login with Moralis
 				if (!user) {
 					 try {
 							user = await Moralis.authenticate({ signingMessage: "Load your NFTs into NFT gm." })
@@ -158,6 +163,7 @@
 			}
 
 			async function logOut() {
+				// Logout with Moralis
 				await Moralis.User.logOut();
 				$("#nfts").empty()
 				user = null
@@ -167,12 +173,14 @@
 
 
 			async function speakUp(element) {
+				// Use selected NFT (element) to post on the feed
 				const postEntry = document.getElementById("post_template").content.cloneNode(true)
 				postEntry.getElementById("img").src = element.querySelector("img").src
 				postEntry.getElementById("name").innerText = element.querySelector("img").alt
 				document.getElementById("feed").prepend(postEntry)
 			}
 
+			// Call functions upon click events
 			document.getElementById("btn-login").onclick = login;
 			document.getElementById("btn-logout").onclick = logOut;
 			document.getElementById("btn-refresh-nfts").onclick = parseNfts;
