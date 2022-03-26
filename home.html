@@ -110,6 +110,7 @@
 				// Collect NFTs from Moralis and inject them into the page
 				document.getElementById("nfts").innerHTML = ""
 				address = user.get('ethAddress')
+				console.log(address)
 				const settings = {
 					"async": true,
 					"crossDomain": true,
@@ -120,19 +121,10 @@
 						"Authorization": "cda7271d-f064-4b47-ac28-9481da8ea285"
 					}
 				};
-				console.log()
+				console.log(settings)
 				$.ajax(settings).done(function (nfts) {
-
-					if (nfts.total == 0) {
-						console.log("No NFTs found for this user.")
-						const nftElement = document.getElementById("nft_template").content.cloneNode(true)
-						nftElement.querySelector("h1").innerText = "This is not an NFT."
-						nftElement.querySelector("img").src = "https://upload.wikimedia.org/wikipedia/commons/1/13/Magritte1-1-2008.jpg"
-						nftElement.querySelector("img").alt = "Non-NFT"
-						nftElement.querySelector("p").innerText = "You don't seem to have any NFTs, but you can still play along."
-						document.getElementById("nfts").append(nftElement)
-					}
-					else {
+					console.log(nfts.total)
+					if (nfts.total > 0) {
 						for(let i = 0; i <= 4; i++) { // five is a weird limit. Remove the limit or add a notificatgion to the user
 							const nftElement = document.getElementById("nft_template").content.cloneNode(true)
 
@@ -152,7 +144,14 @@
 							}
 						document.getElementById("nfts").append(nftElement)
 						}
-
+					else {
+						console.log("No NFTs found for this user.")
+						const nftElement = document.getElementById("nft_template").content.cloneNode(true)
+						nftElement.querySelector("h1").innerText = "This is not an NFT."
+						nftElement.querySelector("img").src = "https://upload.wikimedia.org/wikipedia/commons/1/13/Magritte1-1-2008.jpg"
+						nftElement.querySelector("img").alt = "Non-NFT"
+						nftElement.querySelector("p").innerText = "You don't seem to have any NFTs, but you can still play along."
+						document.getElementById("nfts").append(nftElement)
 					}
 				});
 			}
