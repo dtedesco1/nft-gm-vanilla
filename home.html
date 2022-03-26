@@ -152,11 +152,12 @@
 				// Login with Moralis
 				if (!user) {
 					 try {
-							user = await Moralis.authenticate({ signingMessage: "Load your NFTs into NFT gm." })
-							parseNfts();
-							btnMngmt();
+						user = await Moralis.authenticate({ signingMessage: "Load your NFTs into NFT gm." })
+						console.log("authentication complete")
+						parseNfts();
+						btnMngmt();
 					} catch(error) {
-						 console.log(error)
+						console.log(error)
 					}
 				}
 				console.log("logged in")
