@@ -85,8 +85,12 @@
 			// Moralis Setup
 			const serverUrl = "https://dhr2dvcmfyso.usemoralis.com:2053/server";
 			const appId = "viyjKmaI29omptWLUOwbL5dtVxSz0x9Wb7rp8TG4";
+			console.log("Starting Moralis")
 			Moralis.start({ serverUrl, appId });
+			console.log("Start Moralis complete.")
+			console.log("Setting user to Moralis.User.current()")
 			let user = Moralis.User.current();
+			console.log("Setting Moralis user complete.")
 			btnMngmt();
 
 
